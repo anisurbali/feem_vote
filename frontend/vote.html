@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h2>Select exactly 10 candidates</h2>
+<p id="count">Selected: 0 / 10</p>
+<div id="list"></div>
+<button onclick="submitVote()" disabled id="btn">Submit Vote</button>
+
+<script>
+const token = localStorage.getItem("token");
+let selected = [];
+
+fetch("https://YOUR-BACKEND.onrender.com/api/candidates", {
+  headers: { Authorization: "Bearer " + token }
+})
+.then(res => res.json())
+.then(data => {
+  data.forEach(c => {
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.onchange = () => toggle(c.id);
+
+    const label = document.createElement("label");
+    label.append(cb, " " + c.name);
+
+    list.append(label, document.createElement("br"));
+  });
+});
+
+function toggle(id) {
+  if (selected.includes(id))
+    selected = selected.filter(x => x !== id);
+  else if (selected.length < 10)
+    selected.push(id);
+
+  count.innerText = `Selected: ${selected.length} / 10`;
+  btn.disabled = selected.length !== 10;
+}
+
+function submitVote() {
+  fetch("https://YOUR-BACKEND.onrender.com/api/vote", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token
+    },
+    body: JSON.stringify({ selected })
+  }).then(res => {
+    if (res.ok) location.href = "thankyou.html";
+    else alert("Vote failed");
+  });
+}
+</script>
+</body>
+</html>
