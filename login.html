@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h2>Voter Login</h2>
+
+<input id="username" placeholder="Username"><br><br>
+<input id="password" type="password" placeholder="Password"><br><br>
+<button onclick="login()">Login</button>
+
+<script>
+async function login() {
+  const res = await fetch("https://YOUR-BACKEND.onrender.com/api/login", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      username: username.value,
+      password: password.value
+    })
+  });
+
+  if (!res.ok) return alert("Login failed");
+
+  const data = await res.json();
+  localStorage.setItem("token", data.token);
+
+  if (data.has_voted) alert("You already voted");
+  else location.href = "vote.html";
+}
+</script>
+</body>
+</html>
